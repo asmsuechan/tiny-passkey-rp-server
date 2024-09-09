@@ -148,7 +148,7 @@ app.post("/auth/register", async (req, res) => {
 
   const credential = new CredentialRecord(
     req.body.type,
-    req.body.id,
+    req.body.credentialId,
     `04${x}${y}`,
     signCount,
     req.body.transports,
@@ -158,6 +158,7 @@ app.post("/auth/register", async (req, res) => {
     hexAttestationObject,
     hexClientDataJson
   );
+  console.log(credential);
 
   // NOTE: 作成済みのユーザーIDをclientのリクエストに含める
   const user = users.find((u) => u.id === req.body.userId);
