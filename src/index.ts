@@ -101,10 +101,10 @@ app.post("/auth/register", async (req, res) => {
 
   const decodedPubKey = decode(credentialPublicKey);
   const pubkeyX = [...new Uint8Array(decodedPubKey["-2"])]
-    .map((x) => x.toString(16))
+    .map((x) => x.toString(16).padStart(2, "0"))
     .join("");
   const pubkeyY = [...new Uint8Array(decodedPubKey["-3"])]
-    .map((x) => x.toString(16))
+    .map((x) => x.toString(16).padStart(2, "0"))
     .join("");
 
   const credential = new CredentialRecord(
@@ -119,7 +119,6 @@ app.post("/auth/register", async (req, res) => {
     hexAttestationObject,
     hexClientDataJson
   );
-  console.log(credential);
 
   // NOTE: 作成済みのユーザーIDをclientのリクエストに含める
   const user = users.find((u) => u.id === req.body.userId);
