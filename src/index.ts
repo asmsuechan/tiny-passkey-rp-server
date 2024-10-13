@@ -199,10 +199,6 @@ app.post("/auth/login", async (req, res) => {
     return;
   }
 
-  console.log("==================");
-  console.log(user);
-  console.log(userHandle);
-  console.log("==================");
   // NOTE: userHandleを使って、Credentialがそのユーザーのものかを確認する
   if (userHandle !== null && user.userHandle !== userHandle) {
     res.status(400);
