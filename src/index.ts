@@ -37,12 +37,17 @@ app.post("/users", async (req, res) => {
   const user: User = new User(
     randomBytes(32).toString("base64").substring(0, 32),
     req.body.name,
-    "randomrandomrandom", // ちゃんとランダムな64バイトの文字列にする必要がある
+    randomBytes(32).toString("base64").substring(0, 32),
     []
   );
   users.push(user);
   res.status(200);
-  res.json({ id: user.id, name: user.name, displayName: user.name });
+  res.json({
+    id: user.id,
+    name: user.name,
+    displayName: user.name,
+    userHandle: user.userHandle,
+  });
   return;
 });
 
@@ -91,7 +96,6 @@ app.post("/auth/register", async (req, res) => {
   );
   const credentialId = rest.slice(18, 18 + lnum);
   const credentialPublicKey = rest.slice(18 + lnum, rest.length);
-  console.log(rpidhash, flags, signCount, credentialId, credentialPublicKey);
 
   const parsedFlags = parseInt(flags.toString("hex"), 16)
     .toString(2)
@@ -109,7 +113,7 @@ app.post("/auth/register", async (req, res) => {
 
   const credential = new CredentialRecord(
     req.body.type,
-    req.body.credentialId,
+    credentialId,
     `04${pubkeyX}${pubkeyY}`,
     signCount,
     req.body.transports,
@@ -183,6 +187,7 @@ app.post("/auth/login", async (req, res) => {
   const hexClientDataJson = req.body.hexClientDataJson;
   const hexAuthData = req.body.hexAuthData;
   const userName = req.body.userName;
+  const userHandle = req.body.userHandle;
   const hexSignature = req.body.hexSignature;
 
   const authData = new Uint8Array(Buffer.from(hexAuthData, "hex"));
@@ -191,6 +196,17 @@ app.post("/auth/login", async (req, res) => {
   if (!user) {
     res.status(404);
     res.json({ message: "User not found" });
+    return;
+  }
+
+  console.log("==================");
+  console.log(user);
+  console.log(userHandle);
+  console.log("==================");
+  // NOTE: userHandleを使って、Credentialがそのユーザーのものかを確認する
+  if (userHandle !== null && user.userHandle !== userHandle) {
+    res.status(400);
+    res.json({ message: "Invalid user handle" });
     return;
   }
 
